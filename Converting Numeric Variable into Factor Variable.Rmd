@@ -1,0 +1,9 @@
+Converting Numeric Variable into Factor Variable
+
+'classe' is the Numeric variable
+'datatr1' is the dataframe
+levels 1:5 are converted into A:E
+
+cols <- c("classe")
+datatr1[,cols] <- data.frame(apply(datatr1[cols], 2, as.factor))
+levels(datatr1$classe)  <- c("A","B","C","D","E")

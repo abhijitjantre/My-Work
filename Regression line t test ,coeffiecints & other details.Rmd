@@ -1,0 +1,20 @@
+library(UsingR)
+data(diamond)
+y <- diamond$price; x <- diamond$carat; n <- length(y)
+fit <- lm(y ~ x)
+e <- resid(fit)
+yhat <- predict(fit)
+y <- diamond$price 
+x <- diamond$carat
+n <- length(y)
+beta1 <- cor(y,x)*sd(y)/sd(x)
+beta0 <- mean(y)-beta1*mean(x)
+e <- y-beta0-beta1*(x)
+
+Finding the coeficients
+sumcoef <- summary(fit)$coefficients
+sumcoef
+
+Confidence Intervals
+sumcoef[1,1]+c(-1,1)*qt(0.975,df=fit$df)*sumcoef[1,2]
+sumcoef[2,1]+c(-1,1)*qt(0.975,df=fit$df)*sumcoef[2,2]

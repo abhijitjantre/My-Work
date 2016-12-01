@@ -1,0 +1,42 @@
+library(kernlab)
+data(spam)
+str(spam)
+set.seed(1000)
+smallspam <- spam[sample(dim(spam)[1],size=10),]
+spamlabel <- (smallspam$type=="spam")
+a <- plot(smallspam$capitalAve,col=spamlable)
+rule1 <- function(x){
+      prediction <- rep(NA,length(x))
+      prediction[x>2.91] <- "spam"
+      prediction[x<2.34] <- "nonspam"
+      prediction[x>=2.34&x<=2.40] <- "spam"
+      prediction[x>2.40&x<=2.91] <- "nonspam"
+      prediction
+}
+table(rule1(smallspam$capitalAve),smallspam$type)
+
+rule2 <- function(x){
+      prediction <- rep(NA,length(x))
+      prediction[x>2.34] <- "spam"
+      prediction[x<=2.34] <- "nonspam"
+      prediction
+}
+table(rule2(smallspam$capitalAve),smallspam$type)
+
+table(rule1(spam$capitalAve),spam$type)
+
+table(rule2(spam$capitalAve),spam$type)
+
+sum(rule1(spam$capitalAve)==spam$type)
+
+sum(rule2(spam$capitalAve)==spam$type)
+
+a <- sum(rule1(spam$capitalAve)==spam$type)
+b <- sum(rule2(spam$capitalAve)==spam$type)
+Accuracydatasetrule1=a/(653+558)
+Accuracydatasetrule2=b/(653+558+b)
+
+c <- sum(rule1(smallspam$capitalAve)==smallspam$type)
+d <- sum(rule2(smallspam$capitalAve)==smallspam$type)
+Accuracysamplerule1=c/(c+0)
+Accuracysamplerule2=d/(2+d)

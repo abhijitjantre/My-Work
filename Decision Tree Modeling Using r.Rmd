@@ -1,0 +1,15 @@
+data(iris)
+library(caret)
+library(rpart)
+library(rpart.plot)
+inTrain <- createDataPartition(y=iris$Species,p=2/3,list=FALSE)
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+dim(training)
+dim(testing)
+dtm <- rpart(Species~.,training,method="class")
+dtm
+rpart.plot(dtm,type=4,extra=101)
+p <- predict(dtm,testing,type = "class")
+table(testing[,5],p)
+mean(p==testing[,5])

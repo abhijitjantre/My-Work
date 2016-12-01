@@ -1,0 +1,18 @@
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(randomForest)
+data("iris")
+inTrain <- createDataPartition(y=iris$Species,p=2/3,list=FALSE)
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+dim(training)
+dim(testing)
+rfm <- randomForest(Species~.,training)
+rfm
+p <- predict(rfm,testing)
+table(testing[,5],p)
+mean(testing[,5]==p)
+getTree(rfm,500,labelVar = TRUE)
+library(ggplot2)
+qplot(Petal.Width,Petal.Length,col=Species,data=iris)

@@ -1,0 +1,107 @@
+## Sourcing the data into R
+datatr <- read.csv("E:/Documents/Coursera/Machine Learning/Week 4 Programming Assignment/pml-training.csv",na.strings=c("NA","#DIV/0!",""))
+testingdata <- read.csv("E:/Documents/Coursera/Machine Learning/Week 4 Programming Assignment/pml-testing.csv",na.strings=c("NA","#DIV/0!",""))
+
+## Loading the required libraries
+library(caret)
+library(ggplot2)
+library(randomForest)
+library(rpart)
+library(rpart.plot)
+library(RColorBrewer)
+library(rattle)
+library(RMySQL)
+library(pROC)
+library(foreach)
+library(doParallel)
+library(gbm)
+library(Hmisc)
+
+## Cleaning the data by removing all columns that contains NA and removing features that are not in the testing dataset.Since the testing dataset has no time-dependence, these values are useless and can be disregarded.  We will also remove the first 7 features since they are related to the time-series or are not numeric.
+features <- names(testingdata[,colSums(is.na(testingdata)) == 0])[8:59]
+
+## Only use features used in testing cases
+datatr <- datatr[,c(features,"classe")]
+testingdata <- testingdata[,c(features,"problem_id")]
+dim(datatr)
+dim(testingdata)
+
+## Removing Question Marks in the data
+datatr[datatr=="?"] <- NA
+
+## Removing NearZero Covariates / Predictors
+nzv1 <- nearZeroVar(datatr,saveMetrics=TRUE)
+nzv1 
+
+## Replacing all punctuation marks in all columns by "_"
+colnames(datatr) <- gsub(pattern="[[:punct:]]",replacement="_",x=colnames(datatr))
+
+## Converting the class of "classe" covriate into numeric
+datatr$classe <- as.numeric(datatr$classe)
+
+## Creating Dummy Variables by converting all Factor Variables
+dmy <- dummyVars("~.",data=datatr)
+
+## Creating New Dataframe with Dummy Variables
+datatr1 <- data.frame(predict(dmy,newdata=datatr))
+dim(datatr1)
+
+## Removing NearZero Covariates / Predictors in new dataframe
+nzv2 <- nearZeroVar(datatr1,saveMetrics=TRUE)
+nzv2
+
+## Converting the class of "classe" covriate into factor
+
+cols <- c("classe")
+datatr1[,cols] <- data.frame(apply(datatr1[cols], 2, as.factor))
+levels(datatr1$classe)  <- c("A","B","C","D","E")
+
+## Removing NA & Missing Values
+datatr1[is.na(datatr1)] <- 0
+
+## Creating Training & Test Data Sets
+set.seed(6)
+inTrain <- createDataPartition(y=datatr1$classe,p=0.7,list=FALSE)
+training <- datatr1[inTrain,]
+testing <- datatr1[-inTrain,]
+
+## Computing & Checking whether Area Under Curve > 0.5
+lm1 <- lm(classe~.,data=training)
+newdata <- data.frame(testing)
+pred <- predict(lm1,newdata)
+print(auc(testing$classe,pred))
+
+set.seed(15)
+## Boosting using GBM Method
+fitGBM <- train(classe ~ ., data=training, method="gbm",verbose=FALSE)
+predGBM <- predict(fitGBM, testing)
+c1 <- confusionMatrix(predGBM, testing$classe)$overall[1]
+
+## Prediction Using Random Forest Method
+fitRF <- train(classe ~ ., data=training, method="rf")
+predRF <- predict(fitRF, testing)
+c2 <- confusionMatrix(predRF, testing$classe)$overall[1]
+
+## Prediction Using Linear Discriminant Analysis Method
+fitLDA <- train(classe ~ ., data=training, method="lda")
+predLDA <- predict(fitLDA, testing)
+c3 <- confusionMatrix(predLDA, testing$classe)$overall[1]
+
+##Stacking the predictions together using random forest
+pred <- data.frame(predRF, predGBM, predLDA, classe=testing$classe)
+fit <- train(classe ~ ., data=pred, method="rf")
+predfit <- predict(fit, testing)
+c4 <- confusionMatrix(predfit, testing$classe)$overall[1]
+
+## Predictions using Decision Tree  Model
+fitDT <- rpart(classe~.,data=training,method="class")
+prediction <- predict(fitDT,testing,type="class")
+c5 <- confusionMatrix(prediction, testing$classe)$overall[1]
+
+## Predicting on the testingdata i.e. pml-testing.csv Using LDA
+predLDA <- predict(fitLDA, testingingdata)
+predLDA
+
+
+
+

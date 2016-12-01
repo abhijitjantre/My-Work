@@ -1,0 +1,8 @@
+data(iris)
+d <- iris[,-5]
+cor(d)
+library(corrplot)
+cr <- cor(d)
+corrplot(cr)
+corrplot(cr,method="pie")
+corrplot(cr,method="number")

@@ -1,0 +1,55 @@
+diabetes <- read.csv("E:/Documents/diabetes/diabetic.csv")
+dim(diabetes)
+library(caret)
+diabetes <- subset(diabetes,select=-c(encounter_id,patient_nbr))
+diabetes[diabetes=="?"]<- NA
+diabetes$readmitted <- ifelse(diabetes$readmitted=="<30",1,0)
+diabetes <- subset(diabetes,select=-c(diag_1,diag_2,diag_3))
+str(diabetes)
+nzv <- nearZeroVar(diabetes,saveMetrics = TRUE)  # Removing nearzero covariates
+nzv #  Removing all  TRUE TRUE values
+diabetes <- subset(diabetes,select = -c(examide,citoglipton))
+dmy <- dummyVars(" ~ .", data = diabetes)  # Creating Dummy Variable by converting all factor variables
+diabetes1 <- data.frame(predict(dmy, newdata = diabetes)) # Creating new dataframe with dummy variables
+dim(diabetes1)  # New dataframe ( diabetes1 ) has more columns
+colnames(diabetes1) <- gsub(pattern = "[[:punct:]]",replacement="_",x=colnames(diabetes1)) # Removing unwanted punctuations in diabetes1 column names
+nzv <- nearZeroVar(diabetes1,saveMetrics = TRUE)  # Removing nearzero covariates
+nzv #  Removing all  TRUE TRUE values
+diabetes1 <- subset(diabetes1,select=-c(race__,weight__,payer_code__,medical_specialty__)) # Replacing the columns pertaining to TRUE TRUE nzv values
+diabetes1[is.na(diabetes1)] <- 0   # Removing NA & missing values
+set.seed(22)
+inTrain <- createDataPartition(y=diabetes1$readmitted,p=0.7,list=FALSE)
+training <- diabetes1[inTrain,]
+testing <- diabetes1[-inTrain,]
+lm1 <- lm(readmitted~.,data=training)
+newdata <- data.frame(testing)
+pred<- predict(lm1,newdata)
+library(pROC)
+print(auc(testing$readmitted,pred))  ## Computing & checking if Area Under Curve > 0.5
+outcomeName <- 'readmitted'
+predictorNames <- setdiff(names(training),outcomeName)
+## Performing Bagging
+
+library(foreach)
+library(doParallel)
+cl <- makeCluster(8)
+registerDoParallel(cl)
+length_divisor <- 20
+predictions <- foreach(m=1:400,.combine=cbind)%dopar%{
+      # Using sample function without seed
+      sampleRows <- sample(nrow(training),size=floor((nrow(training)/length_divisor)))
+      fit <- lm(readmitted~.,data=training[sampleRows,])
+      predictions <- data.frame(predict(object=fit,testing[,predictorNames],se.fit=TRUE)[[1]])
+}
+stopCluster(cl)
+library(pROC)
+auc(testing[,outcomeName],rowMeans(predictions))
+
+## Using Boosting
+modFit <- train(readmitted~.,method="gbm",data=training,verbose=FALSE)
+print(modFit)
+
+newdata <- data.frame(testing)
+pred<- predict(modFit,newdata)
+
+

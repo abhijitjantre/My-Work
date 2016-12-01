@@ -1,0 +1,21 @@
+load("E:/Documents/gaData.rda")
+fix(gaData)
+str(gaData)
+summary(gaData)
+gaData$julian <- julian(gaData$date)
+head(gaData)
+tail(gaData)
+plot(gaData$visits~gaData$julian,pch=19,col="blue")
+lm1<-lm(gaData$visits~gaData$julian)
+abline(lm1,col="red",lwd=3)
+
+Finding the beta0 & beta1 when x axis values cannot be used for calculation
+
+exp(coef(lm(I(log(gaData$visits+1))~gaData$julian)))
+
+plotting line using glm function
+
+glm1<-glm(gaData$visits~gaData$julian,family="poisson")
+lines(gaData$julian,glm1$fitted,lwd=3,col="orange")
+
+plot(glm1$fitted,glm1$residuals,pch=19,col="orange")

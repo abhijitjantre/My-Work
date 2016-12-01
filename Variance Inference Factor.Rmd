@@ -1,0 +1,16 @@
+data(swiss)
+attach(swiss)
+fit1 <- lm(Fertility~Agriculture,data=swiss)
+a <- summary(fit1)$cov[2,2]
+fit2 <- update(fit1,Fertility~Agriculture+Examination)
+fit3 <- update(fit2,Fertility~Agriculture+Examination+Education)
+c(summary(fit2)$cov[2,2],summary(fit3)$cov[2,2])/a
+
+Variance Inference Factor
+
+library(car)
+fit <- lm(Fertility~.,data=swiss)
+vif(fit)
+sqrt(vif(fit))
+
+anova(fit1,fit2,fit3)

@@ -1,0 +1,8 @@
+```{r}
+library(rCharts)
+haireye <- as.data.frame(HairEyeColor)
+n1 <- nPlot(Freq ~ Hair, group='Eye', type = 'multiBarChart', data = subset(haireye,Sex=="Male"))
+n1$save("E:/Documents/n1.html",cdn = TRUE)
+cat('<iframe src="E:/Documents/n1.html" ></iframe>')  ##  For slidifying the document
+n1
+```

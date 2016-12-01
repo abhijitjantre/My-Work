@@ -1,0 +1,7 @@
+library(rCharts)
+library(reshape2)
+data("USPersonalExpenditure")
+usexp <- melt(USPersonalExpenditure)
+colnames(usexp) <- c("catagory","year","value")
+x1 <- xPlot(value ~ year, group = "catagory", data = usexp, type = "line-dotted", xlab= "Year", ylab = "Value")
+x1

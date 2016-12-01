@@ -1,0 +1,23 @@
+## Iris Example ignoring Species Lables
+
+library(caret)
+library(ggplot2)
+data(iris)
+inTrain <- createDataPartition(y=iris$Species,p=0.7,list = FALSE)
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+kmeans1 <- kmeans(subset(training,select = -c(Species)),centers = 3)
+
+## Since kmeans1$cluster does not have any class, factor class is assigned to it.
+training$clusters <- as.factor(kmeans1$cluster)
+ggplot(training,aes(x= Petal.Width, y= Petal.Length,col=clusters))+geom_point()
+
+## Comparing to Real Labels
+table(kmeans1$cluster,training$Species)
+
+## Building Predictor
+library(rpart)
+modFit <- train(clusters~.,data=subset(training,select=-c(Species)),method="rpart")
+table(predict(modFit,training),training$Species)
+table(predict(modFit,testing),testing$Species)
+

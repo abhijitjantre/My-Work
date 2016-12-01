@@ -1,0 +1,10 @@
+library(rCharts)
+library(reshape2)
+data("USPersonalExpenditure")
+usexp <- melt(USPersonalExpenditure)
+colnames(usexp) <- c("catagory","year","value")
+usexp$year <- as.numeric(as.POSIXlt(paste0(usexp$year,"-01-01")))
+p <- Rickshaw$new()
+p$layer(value~year, group="catagory",data =usexp,type="area")
+p$set(slider=TRUE)
+p

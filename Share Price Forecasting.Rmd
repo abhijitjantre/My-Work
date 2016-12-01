@@ -1,0 +1,37 @@
+library(quantmod)
+from.dat <- as.Date("01/01/08",format="%m/%d/%y")
+to.dat <- as.Date("12/31/13",format="%m/%d/%y")
+getSymbols("MSFT", src="google",from=from.dat,to=to.dat)
+head(MSFT)
+
+## Summarize monthly and store as time series
+mMSFT <- to.monthly(MSFT)
+MSFTOpen <- Op(mMSFT)
+ts1 <- ts(MSFTOpen,frequency=12)
+plot(ts1,xlab="Years+1",ylab="MSFT")
+
+## Decomposing a time series into parts
+plot(decompose(ts1),xlab="Years+1")
+
+## Creating Training & Test Sets
+ts1Train <- window(ts1,start=1,end=5)
+ts1Test <- window(ts1,start=5,end=(7-0.01))
+
+## Forecasting Using Simple Moving Average
+ma <- function(arr, n=15){
+  res = arr
+  for(i in n:length(arr)){
+    res[i] = mean(arr[(i-n):i])
+  }
+  res
+}
+plot(ts1Train)
+lines(ma(ts1Train,order=3),col="red")
+
+## Forecasting Using Exponential Smoothening
+library(forecast)
+ets1 <- ets(ts1Train,model="MMM")
+fcast <- forecast(ets1)
+plot(fcast)
+lines(ts1Test,col="red")
+accuracy(fcast,ts1Test)

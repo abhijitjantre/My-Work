@@ -1,0 +1,20 @@
+library(ElemStatLearn)
+data(ozone)
+a <- order(ozone$ozone)
+b <- ozone[a,]
+head(b)
+dim(b)
+ll <- matrix(NA,nrow=10,ncol=155)     ## ll has nothing to do with dimensions of b
+for(i in 1:10){
+      ss <- sample(1:nrow(ozone),replace=TRUE)
+      ozone1 <- ozone[ss,]
+      c <-order(ozone1$ozone)
+      ozone2 <- ozone1[c,]
+      loess1 <- loess(temperature~ozone,data=ozone2,span=0.2)
+      ll[i,] <- predict(loess1,newdata=data.frame(ozone=1:155))
+}
+plot(temperature~ozone,data=ozone,pch=19,cex=0.5)
+for(i in 1:10){
+      lines(1:155,ll[i,],col="grey",lwd=2)
+}
+lines(1:155,apply(ll,2,mean),col="red",lwd=3)

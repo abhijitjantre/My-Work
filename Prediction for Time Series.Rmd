@@ -1,0 +1,47 @@
+data(AirPassengers)
+ap <- AirPassengers
+ap.decom <- decompose(ap,type="mult")
+plot(ap.decom)
+random <- ap.decom$random
+random
+pacf(random,na.action=na.exclude)   ## Partial Auto Corelation Function
+acf(random,na.action=na.exclude)    ## Auto Corelation Function
+
+## Model 1
+m1 <- arima(random,order=c(1,0,0))  ## here 1 means 1 lag
+m1
+res1 <- residuals(m1)
+shapiro.test(res1)          ## Null hypothesis : Residual values are normally distributed. P value must be >0.05
+confint(m1)                 ## Checking whether ar1 & intercept lie within respective confidence intervals
+predict(m1,n.ahead=10)      ## Predicting for next 10 months
+M1 <- matrix(c(-541.57,273.78),ncol=2,nrow=1,byrow=FALSE)
+colnames(M1) <- c("AIC","LL")
+rownames(M1) <- c("Model 1")
+M1
+
+## Model 2
+m2 <- arima(random,order=c(2,0,0))  ## here 2 means 2 lags
+m2
+res2 <- residuals(m2)
+shapiro.test(res2)          ## Null hypothesis : Residual values are normally distributed. P value must be >0.05
+confint(m2)                 ## Checking whether ar1 & intercept lie within respective confidence intervals.                                    Since ar2 value is negative, it is insignificant. 
+predict(m2,n.ahead=10)      ## Predicting for next 10 months
+M2 <- matrix(c(-540,274),ncol=2,nrow=1,byrow=FALSE)
+colnames(M2) <- c("AIC","LL")
+rownames(M2) <- c("Model 2")
+M2
+
+## Model 3 ( ARMA Model)
+m3 <- arima(random,order=c(1,0,1))  ## here 2 means 2 lags and 0 indicates Difference Operator. 1st Lag is y                                           intercept & 2nd is Moving Average
+m3
+res3 <- residuals(m3)
+shapiro.test(res3)          ## Null hypothesis : Residual values are normally distributed. P value must be >0.05
+confint(m3)                 ## Checking whether ar1 & intercept lie within respective confidence intervals.                                    Since ma1 value is negative, it is insignificant. 
+predict(m3,n.ahead=10)      ## Predicting for next 10 months
+M3 <- matrix(c(-539.77,273.88),ncol=2,nrow=1,byrow=FALSE)
+colnames(M3) <- c("AIC","LL")
+rownames(M3) <- c("Model 2")
+M3
+
+Conclusion
+As AIC & LL values are lowest for Model 1, it is selcted.

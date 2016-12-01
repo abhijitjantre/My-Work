@@ -1,0 +1,4 @@
+library(rCharts)
+haireye <- as.data.frame(HairEyeColor)
+r2 <- rPlot(Freq ~ Hair | Eye, color="Eye", data = haireye, type = "bar")
+r2

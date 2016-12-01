@@ -1,0 +1,16 @@
+data(InsectSprays)
+attach(InsectSprays)
+A<-InsectSprays[InsectSprays$spray=="A",]
+B<-InsectSprays[InsectSprays$spray=="B",]
+C<-InsectSprays[InsectSprays$spray=="C",]
+D<-InsectSprays[InsectSprays$spray=="D",]
+E<-InsectSprays[InsectSprays$spray=="E",]
+F<-InsectSprays[InsectSprays$spray=="F",]
+summary(lm(count~spray))
+boxplot(count~spray,data=InsectSprays)
+summary(lm(count~spray-1))
+
+
+Reordering the Reference levels
+spray2<-relevel(InsectSprays$spray,"C")
+summary(lm(count~spray2, data=InsectSprays))

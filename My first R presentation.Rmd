@@ -1,0 +1,69 @@
+---
+title: "My First R Presentation"
+author: "Abhijit Jantre"
+date: "December 2, 2016"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## My New Slide
+New Content
+Plain Text
+
+*Italicized text*
+
+**Bold text**
+
+`for (i %in% 1:10)`
+
+## My Title
+
+### A Top Level Sub-heading
+- Bullet 1
+
+#### A Second Level Sub-heading
+- Bullet 2
+
+*** 
+Slide without heading
+# Here eval =TRUE by default
+```{r}             
+head(iris,3)
+```
+
+```{r, comment="", eval=FALSE}
+head(iris,2)
+
+```
+
+```{r, comment=""}
+head(mtcars,2)
+```
+
+## R Markdown
+
+This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+## Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Output
+
+```{r cars, echo = TRUE}
+summary(cars)
+```
+
+## Slide with Plot
+
+```{r, echo=TRUE,fig.align='center',fig.cap='My Analysis'}
+plot(mtcars$wt,mtcars$mpg,xlab = "Weight", ylab = "MPG")
+```
+

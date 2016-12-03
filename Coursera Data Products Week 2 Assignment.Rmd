@@ -1,0 +1,46 @@
+---
+title: "Coursera Data Products Week 2 Assignment"
+author: "Abhijit Jantre"
+date: "December 3, 2016"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## My Houses
+
+This is a R Markdown presentation for my houses in Mumbai.
+
+
+## Houses are addressed in Mumbai at
+
+- Lalbaug
+- Versova
+- Seawoods
+
+
+
+## Mapped Addresses of My Houses in Mumbai
+
+```{r , echo=FALSE}
+library(leaflet)
+MyHouses <- makeIcon(
+      iconUrl="http://f1.pepst.com/c/22D30D/490041/ssc3/home/097/orkut.facebook/albums/abhijeet.sun.dj.gif_480_480_0_64000_0_1_0.gif",
+      iconWidth = 60, iconHeight = 60,
+      iconAnchorX = 16 , iconAnchorY = 16
+)
+
+MyHousesAddresses <- data.frame(
+      lat = c(18.9939,19.1351,19.0094),
+      lng = c(72.8371,72.8146,73.0199)
+)
+
+MyHousesAddresses %>%
+      leaflet() %>%
+      addTiles() %>%
+      addMarkers(icon = MyHouses)
+```
+
+

@@ -1,0 +1,9 @@
+## My First Map
+```{r, echo=FALSE}
+library(leaflet)
+my_map <- leaflet() %>%
+      addTiles() %>%
+      addMarkers(lng = 72.8231, lat = 19.0181, popup ="Siddhivinayak Mandir")
+my_map
+```
+

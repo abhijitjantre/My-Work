@@ -1,0 +1,14 @@
+## Mapping cities with population weight using leaflet
+```{r echo=FALSE}
+cities <- data.frame(name = c("Mumbai","Navi Mumbai","Pune","Satara","Kolhapur"),
+                     pop =c(18394912,1119477,5057709,3003741,561837),
+                     lat=c(19.0760,19.0330,18.5204,17.5780,16.7050),
+                     lng=c(72.8777,73.0297,73.8567,74.0300,74.2433)) 
+
+cities%>%
+      leaflet() %>%
+      addTiles() %>%
+      addCircles(weight=6, radius= sqrt(cities$pop)*6 )
+```
+
+

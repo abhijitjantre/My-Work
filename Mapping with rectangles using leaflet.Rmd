@@ -1,0 +1,7 @@
+## Mapping with rectangles using leaflet
+```{r echo=FALSE}
+      leaflet() %>%
+      addTiles() %>%
+      addRectangles(lat1=19.0760, lng1 =72.8777,
+                    lat2=19.0330, lng2=73.0297)
+```

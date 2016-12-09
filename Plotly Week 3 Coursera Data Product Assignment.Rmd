@@ -1,0 +1,39 @@
+---
+title: "Plotly Week 3 Coursera Assignment"
+author: "Abhijit Jantre"
+date: "December 9, 2016"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## ISLR Wage Dataset
+
+```{r}
+library(ISLR)
+data(Wage)
+str(Wage)
+```
+
+## Summary of the dataset
+
+```{r}
+summary(Wage)
+
+```
+
+## Plot
+
+```{r, message=FALSE, warning=FALSE}
+library(plotly)
+par(mar=c(5.1,4.1,4.1,2.1))
+x <- list(title = "Age",showline = TRUE)
+y <- list(title = "Wage", showline = TRUE)
+p <- plot_ly(Wage, 'x' = Wage$age, 'y' = Wage$wage, mode = "markers",type = "scatter", color = Wage$education) %>%
+  layout(xaxis = x, yaxis = y)
+p
+```
+
+

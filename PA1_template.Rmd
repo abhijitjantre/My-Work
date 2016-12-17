@@ -1,0 +1,82 @@
+# REPRODUCIBLE RESEARCH : PEER GRADED ASSIGNMENT 1
+
+## Loading the required libraries
+```{r Libraries}
+library(ggplot2)
+library(Hmisc)
+library(lubridate)
+library(reshape2)
+```
+
+## Loading the data
+```{r Question 1A - Code for reading in the dataset}
+if(!file.exists('activity.csv')) {
+unzip('activity.zip')
+}
+actdata <- read.csv("E:/Documents/Coursera/Reproducible Research/activity.csv")
+```
+
+## Process/transform the data (if necessary) into a format suitable for your analysis
+```{r Question 1B - Code for processing the data}
+actdata$intervals <- strptime(gsub("([0-9]{1,2})([0-9]{2})","\\1:\\2", actdata$interval),
+                          format = '%H:%M')
+```
+
+## What is mean total number of steps taken per day?
+```{r Question 2 - Histogram of the total number of steps taken each day}
+stepsbyday <- tapply(actdata$steps,actdata$date,sum, na.rm=TRUE)
+qplot(stepsbyday, xlab = "Total Number of Steps Taken Each Day",
+      ylab = "Frequency using binwidth 500 ", binwidth=500 , col = "black")
+```
+
+## Mean and median number of steps taken each day
+```{r Question 3 - Computing mean and median number of steps taken each day}
+stepsbydaymean <-  mean(stepsbyday)
+stepsbydaymedian <-  median(stepsbyday)
+```
+
+Mean : `r stepsbydaymean`
+
+Median : `r stepsbydaymedian`
+
+## Time series plot of the average number of steps taken
+```{r Question 4 - Time series plot of the average number of steps taken}
+avgstepspertimeinterval <- aggregate(x=list(meansteps=actdata$steps),
+                                     by=list(interval=actdata$interval),
+                                     FUN = mean, na.rm = TRUE)
+qplot(x=interval,y=meansteps, data = avgstepspertimeinterval)+geom_line()+ xlab("5 min Time Interval")+ ylab("Average Number of Steps Taken")
+```
+
+## The 5-minute interval that, on average, contains the maximum number of steps
+```{r Question 5 - The 5-minute interval that, on average, contains the maximum number of steps}
+avgstepspertimeinterval[which.max(avgstepspertimeinterval$meansteps),]
+```
+
+## Code to describe and show a strategy for imputing missing data
+```{r Question 6 - Code to describe and show a strategy for imputing missing data}
+missing <- is.na(actdata$steps)
+summary(missing)
+### Code for imputing data
+actdataimputed <- actdata
+actdataimputed$steps <- impute(actdataimputed$steps, fun = mean)
+```
+
+## Histogram of the total number of steps taken each day after missing values are imputed
+```{r Question 7 - Histogram of the total number of steps taken each day after missing values are imputed}
+stepsbydayimputed <- tapply(actdataimputed$steps,actdataimputed$date,sum)
+qplot(stepsbydayimputed,xlab = "Total Number of Steps Taken Each Day",
+      ylab = "Frequency using binwidth 500 ", binwidth=500 , col = "black")
+stepsbydayimputedmean <- mean(stepsbydayimputed)
+stepsbydayimputedmedian <- median(stepsbydayimputed)
+```
+Mean (Imputed)   : `r stepsbydayimputedmean`
+
+Median (Imputed) : `r stepsbydayimputedmedian`
+
+## Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
+```{r Question 8 - Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends }
+actdataimputed$dateType <-  ifelse(as.POSIXlt(actdataimputed$date)$wday %in% c(0,6), 'weekend', 'weekday')
+avgstepspertimeintervalimputed <- aggregate(steps~interval+dateType, data = actdataimputed,mean)
+ggplot(data = avgstepspertimeintervalimputed,aes(interval,steps))+geom_line()+
+      facet_grid( dateType ~ .)+xlab("5 minutes Interval")+ ylab("Average Number of Steps")
+```
